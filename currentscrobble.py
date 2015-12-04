@@ -4,16 +4,21 @@ Created on Tue Dec 01 11:43:59 2015
 
 @author: kwher_000
 """
-#import sys  
-#from PyQt4.QtGui import *  
-#from PyQt4.QtCore import *  
-#from PyQt4.QtWebKit import *  
 from lxml import html
 import requests
 from selenium import webdriver
 import csv
 import datetime
 import time
+import pylast
+
+# last fm account information for scrobbling stored in last info.
+# defines API_KEY, API_SECTRET, username, password_hash
+import lastinfo
+
+API_KEY, API_SECRET, username, password_hash=lastinfo.lastinfo()
+
+network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,username=username,password_hash=password_hash)
 
 
 url = 'http://www.thecurrent.org/listen'  
@@ -41,6 +46,7 @@ while True:
 			with open("/home/kyle/current/current.csv","a") as log:
 				writer=csv.writer(log)
 				writer.writerow([datetime.datetime.now(),song,artist,dj])
+			network.scrobble(artist=artist,title=song,timestamp=int(time.time()))	
 		else:
 			with open("/home/kyle/current/current.csv","a") as log:
 				writer=csv.writer(log)
